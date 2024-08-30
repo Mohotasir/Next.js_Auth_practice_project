@@ -1,3 +1,4 @@
+import { connectDB } from "@/lib/connectDB";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -13,7 +14,16 @@ const handler = NextAuth({
         password: {},
       },
       async authorize(credentials) {
-        return true;
+        const {email ,password} = credentials
+        if(!email || !password){
+            return null
+        }
+        const db = await connectDB()
+        const currentUser = await db.collection('user').findOne({email,password})
+        if(!currentUser){
+            return null
+        }
+        return currentUser;
       },
     }),
   ],
